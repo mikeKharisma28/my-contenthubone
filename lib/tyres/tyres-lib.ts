@@ -1,15 +1,17 @@
 import qs from 'qs';
-import { getToken } from 'next-auth/jwt';
 
 export interface TyreWidth {
+  id: string;
   width: number;
 }
 
 export interface TyreProfile {
+  id: string;
   profile: number;
 }
 
 export interface TyreRim {
+  id: string;
   rim: number;
 }
 
@@ -36,45 +38,74 @@ export interface PaginatedTyreDetail {
   tyreDetail: TyreDetail[];
 }
 
-export type SearchableTyreWidth = Pick<TyreWidth, 'width'>;
+export type SearchableTyreWidth = Pick<TyreWidth, 'id'>;
 export type SearchableTyreProfile = Pick<TyreProfile, 'profile'>;
 export type SearchableTyreRim = Pick<TyreRim, 'rim'>;
 
-async function authenticate() {
-    const url = `${process.env.CONTENT_MANAGEMENT_AUTH_URL}`;
-    const response = await fetch(url, {
-        method: "POST",
-        // body: {
-        
-        // }
+async function authenticate(): Promise<string> {
+  const response = await fetch(`${process.env.CONTENT_MANAGEMENT_AUTH_URL}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: `${process.env.SITECORE_CLIENT_ID}`,
+      client_secret: `${process.env.SITECORE_CLIENT_SECRET}`,
+      audience: `${process.env.SITECORE_AUDIENCE}`
     })
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch access token');
+  }
+
+  const tokenData = await response.json();
+  const accessToken = tokenData.access_token;
+
+  return accessToken;
 }
 
-async function fetchTyreWidths(params: any, token: any) {
+async function fetchCMSItems(params: any) {
+  const token = await authenticate();
   const url =
-    `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items?` + qs.stringify(params, { encodeValuesOnly: true });
-  console.log('fetch tyres: ', url);
+    `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items?` +
+    qs.stringify(params, { encodeValuesOnly: true });
   const response = await fetch(url, {
-    method: "GET",
-    credentials: "include",
+    method: 'GET',
+    credentials: 'include',
     headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-    },
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
   });
-  console.log(response);
   if (!response.ok) {
-    throw new Error(`Content hub one returned ${response.status} ${response.statusText} for ${url}`);
+    throw new Error(
+      `Content hub one returned ${response.status} ${response.statusText} for ${url}`
+    );
   }
   return await response.json();
 }
 
-export default async function GetAllTyreWidths(): Promise<SearchableTyreWidth[]> {
-  const { data } = await fetchTyreWidths({
+export default async function GetAllTyreWidths(): Promise<TyreWidth[]> {
+  const { data } = await fetchCMSItems({
     'system.contentType.id': 'tyrewidth'
-  }, '');
-  return data.map(({ data }: any) => ({
-    id: data.id,
-    width: data.fields.width.value
+  });
+  return data.map((item: any) => ({
+    id: item.id,
+    width: item.fields.width.value
   }));
 }
+
+export async function GetTyreProfilesByWidth(width_id: any): Promise<TyreProfile[]> {
+  const { data } = await fetchCMSItems({
+    'system.contentType.id': 'tyreprofile',
+    '': ''
+  });
+  return data.map((item: any) => ({
+    id: item.id,
+    profile: item.fields.profile.value
+  }));
+}
+
+export async function SearchTyres() {}
