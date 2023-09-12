@@ -38,9 +38,9 @@ export interface PaginatedTyreDetail {
   tyreDetail: TyreDetail[];
 }
 
-export type SearchableTyreWidth = Pick<TyreWidth, 'id'>;
-export type SearchableTyreProfile = Pick<TyreProfile, 'profile'>;
-export type SearchableTyreRim = Pick<TyreRim, 'rim'>;
+// export type SearchableTyreWidth = Pick<TyreWidth, 'id'>;
+// export type SearchableTyreProfile = Pick<TyreProfile, 'profile'>;
+// export type SearchableTyreRim = Pick<TyreRim, 'rim'>;
 
 async function authenticate(): Promise<string> {
   const response = await fetch(`${process.env.CONTENT_MANAGEMENT_AUTH_URL}`, {
@@ -100,11 +100,22 @@ export default async function GetAllTyreWidths(): Promise<TyreWidth[]> {
 export async function GetTyreProfilesByWidth(width_id: any): Promise<TyreProfile[]> {
   const { data } = await fetchCMSItems({
     'system.contentType.id': 'tyreprofile',
-    '': ''
+    // '': ''
   });
   return data.map((item: any) => ({
     id: item.id,
     profile: item.fields.profile.value
+  }));
+}
+
+export async function GetTyreRimByProfile(profile_id: any): Promise<TyreRim[]> {
+  const { data } = await fetchCMSItems({
+    'system.contentType.id': 'tyrerim',
+    // '': ''
+  });
+  return data.map((item: any) => ({
+    id: item.id,
+    rim: item.fields.size.value
   }));
 }
 

@@ -3,9 +3,9 @@ import SearchResults from '@/components/Tyres/search-results';
 
 const Page = () => {
   return (
-    <div>
+    <div className="max-h-fit">
       <SearchTyreBySize />
-      <SearchResults />
+      {/* <SearchResults /> */}
     </div>
   );
 };
