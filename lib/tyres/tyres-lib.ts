@@ -1,4 +1,5 @@
-import { fetchRestAPI } from '../Common/api';
+import ALL_TYRES_QUERY, { TYRE_QUERY } from '@/graphQL/Tyres/tyres-query';
+import { fetchGraphQL, fetchRestAPI } from '../Common/api';
 
 export interface TyreWidth {
   id: string;
@@ -38,9 +39,7 @@ export interface PaginatedTyreDetail {
   tyreDetail: TyreDetail[];
 }
 
-// export type SearchableTyreWidth = Pick<TyreWidth, 'id'>;
-// export type SearchableTyreProfile = Pick<TyreProfile, 'profile'>;
-// export type SearchableTyreRim = Pick<TyreRim, 'rim'>;
+// Functions using RestAPI
 export default async function GetAllTyreWidths(): Promise<TyreWidth[]> {
   const { data } = await fetchRestAPI({
     'system.contentType.id': 'tyrewidth'
@@ -73,4 +72,24 @@ export async function GetTyreRimByProfile(profile_id: any): Promise<TyreRim[]> {
   }));
 }
 
+
+// Functions using GraphQL 
 export async function SearchTyres() {}
+
+export async function GetTyreById(id: string): Promise<any> {
+  const tyreQuery = `{
+    data: tyre(id: "${id}")
+    {
+      ${TYRE_QUERY}
+    }
+  }
+  `;
+  
+  const data = await fetchGraphQL(tyreQuery);
+  return data.data.data;
+}
+
+export async function GetAllTyres(): Promise<any> {
+  const data = await fetchGraphQL(ALL_TYRES_QUERY);
+  return data.data.data;
+}

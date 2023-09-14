@@ -20,12 +20,14 @@ export const TYRE_QUERY = `
     }
 `;
 
-export const ALL_TYRES_QUERY = `
+export const ALL_TYRES_QUERY = `{
     data: allTyre {
+        total
         results{
             ${TYRE_QUERY}
         }
     }
+}
 `;
 
 export default ALL_TYRES_QUERY;
