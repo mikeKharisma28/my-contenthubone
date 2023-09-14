@@ -1,8 +1,19 @@
 import Image from 'next/image';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
-const SearchResults = (): JSX.Element => {
+interface SearchResultsProps {
+  apiUrl: string;
+}
+
+function SearchResults({ apiUrl }: SearchResultsProps) {
+  // const SearchResults = (apiUrl: string): JSX.Element => {
   const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch(apiUrl);
+    })();
+  });
 
   return (
     <div className="flex flex-col" ref={ref}>
@@ -49,6 +60,6 @@ const SearchResults = (): JSX.Element => {
       </div>
     </div>
   );
-};
+}
 
 export default SearchResults;

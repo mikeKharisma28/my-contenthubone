@@ -4,7 +4,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { LuCheck, LuChevronsUpDown } from 'react-icons/lu';
 import { TyreProfile, TyreRim, TyreWidth } from '@/lib/tyres/tyres-lib';
-import { Button, Spinner } from "flowbite-react";
+import { Button, Spinner } from 'flowbite-react';
 import SearchResults from './search-results';
 
 const SearchTyreBySize = (): JSX.Element => {
@@ -15,6 +15,7 @@ const SearchTyreBySize = (): JSX.Element => {
   const [tyreProfiles, setTyreProfiles] = useState<TyreProfile[]>([]);
   const [tyreRims, setTyreRims] = useState<TyreRim[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -31,7 +32,7 @@ const SearchTyreBySize = (): JSX.Element => {
         const url = `/api/tyres/getAllTyreProfilesByWidth?widthId=${selectedTyreWidth.id}`;
         const response = await fetch(url);
         const data = await response.json();
-        
+
         setTyreProfiles(data);
         //lanjutin nanti di sini, mengkosongkan profile dan rim kalau ada perubahan pada width
       })();
@@ -42,11 +43,11 @@ const SearchTyreBySize = (): JSX.Element => {
 
   useEffect(() => {
     if (selectedTyreProfile != null) {
-      (async() => {
+      (async () => {
         const url = `/api/tyres/getAllTyreRimsByProfile?widthId=${selectedTyreProfile.id}`;
         const response = await fetch(url);
         const data = await response.json();
-        
+
         setTyreRims(data);
         //lanjutin nanti di sini, mengkosongkan profile dan rim kalau ada perubahan pada width
       })();
@@ -54,10 +55,14 @@ const SearchTyreBySize = (): JSX.Element => {
       setTyreRims([]);
     }
   }, [selectedTyreProfile, selectedTyreWidth]);
-  
 
   function SearchTyre() {
     setIsLoading(true);
+
+    setTimeout(() => {
+      setIsLoading(false);
+      setIsLoaded(true);
+    }, 1000);
   }
 
   return (
@@ -129,7 +134,9 @@ const SearchTyreBySize = (): JSX.Element => {
             <Listbox value={selectedTyreProfile} onChange={setSelectedTyreProfile}>
               <div className="relative mt-1">
                 <Listbox.Button className="relative w-full h-14 cursor-default rounded-lg bg-white border-2 py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
-                  <span className="block truncate text-lg text-black">{selectedTyreProfile?.profile}</span>
+                  <span className="block truncate text-lg text-black">
+                    {selectedTyreProfile?.profile}
+                  </span>
                   <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                     <LuChevronsUpDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
                   </span>
@@ -154,7 +161,9 @@ const SearchTyreBySize = (): JSX.Element => {
                         {({ selected }: any) => (
                           <>
                             <span
-                              className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                              className={`block truncate ${
+                                selected ? 'font-medium' : 'font-normal'
+                              }`}
                             >
                               {item?.profile}
                             </span>
@@ -206,7 +215,9 @@ const SearchTyreBySize = (): JSX.Element => {
                         {({ selected }: any) => (
                           <>
                             <span
-                              className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}
+                              className={`block truncate ${
+                                selected ? 'font-medium' : 'font-normal'
+                              }`}
                             >
                               {item?.rim}
                             </span>
@@ -227,17 +238,14 @@ const SearchTyreBySize = (): JSX.Element => {
         </div>
       </div>
       <div className="flex flex-col items-center justify-center gap-5">
-        <Button 
+        <Button
           onClick={SearchTyre}
-          className="bg-red-700 hover:bg-red-500 text-white font-bold my-5 w-[350px] h-20"
-          disabled={ isLoading ? true : false }
+          className="bg-red-700 hover:bg-red-500 text-white font-bold my-5 w-[200px] h-14"
+          disabled={isLoading ? true : false}
         >
           {isLoading ? (
             <div className="flex flex-row items-center justify-center gap-2">
-              <Spinner
-                className="fill-white text-gray-400"
-                size="lg" 
-              />
+              <Spinner className="fill-white text-gray-400" size="lg" />
               <span className="text-lg">Loading...</span>
             </div>
           ) : (
@@ -246,11 +254,8 @@ const SearchTyreBySize = (): JSX.Element => {
             </div>
           )}
         </Button>
-        {isLoading ? (
-          <SearchResults />
-        ) : (
-          ''
-        )}
+        {isLoading ? <Spinner className="fill-white text-gray-400" size="xl" /> : ''}
+        {isLoaded ? <SearchResults apiUrl="" /> : ''}
       </div>
     </div>
   );

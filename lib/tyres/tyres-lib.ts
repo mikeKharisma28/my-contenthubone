@@ -99,7 +99,7 @@ export default async function GetAllTyreWidths(): Promise<TyreWidth[]> {
 
 export async function GetTyreProfilesByWidth(width_id: any): Promise<TyreProfile[]> {
   const { data } = await fetchCMSItems({
-    'system.contentType.id': 'tyreprofile',
+    'system.contentType.id': 'tyreprofile'
     // '': ''
   });
   return data.map((item: any) => ({
@@ -110,7 +110,7 @@ export async function GetTyreProfilesByWidth(width_id: any): Promise<TyreProfile
 
 export async function GetTyreRimByProfile(profile_id: any): Promise<TyreRim[]> {
   const { data } = await fetchCMSItems({
-    'system.contentType.id': 'tyrerim',
+    'system.contentType.id': 'tyrerim'
     // '': ''
   });
   return data.map((item: any) => ({
