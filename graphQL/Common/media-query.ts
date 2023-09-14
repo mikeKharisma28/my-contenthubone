@@ -1,5 +1,4 @@
-export const MEDIA_QUERY = 
-` 
+export const MEDIA_QUERY = ` 
     id
     name
     fileName
