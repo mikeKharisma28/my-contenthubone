@@ -1,43 +1,40 @@
 import ALL_TYRES_QUERY, { TYRE_QUERY } from '@/graphQL/Tyres/tyres-query';
 import { fetchGraphQL, fetchRestAPI } from '../Common/api';
+import TyreDetail, { TyreOverview, TyreProfile, TyreRim, TyreWidth } from '@/types/tyre-type';
 
-export interface TyreWidth {
-  id: string;
-  width: number;
-}
+// export interface TyreWidth {
+//   id: string;
+//   width: number;
+// }
 
-export interface TyreProfile {
-  id: string;
-  profile: number;
-}
+// export interface TyreProfile {
+//   id: string;
+//   profile: number;
+// }
 
-export interface TyreRim {
-  id: string;
-  rim: number;
-}
+// export interface TyreRim {
+//   id: string;
+//   rim: number;
+// }
 
-export interface TyreDetail {
-  sku: string;
-  name: string;
-  logo: string;
-  type_detail: string;
-  overview: string;
-  features_benefits: string;
-  images: string[];
-  price: number;
-  load: string;
-  speed: string;
-  od: string;
-  type: string;
-  tyre_width: string;
-  tyre_profile: string;
-  tyre_rim: string;
-}
+// export interface TyreOverview {
+//   id: string;
+//   name: string;
+//   type: string;
+//   imageUrl: string;
+// }
 
-export interface PaginatedTyreDetail {
-  pageCount: number;
-  tyreDetail: TyreDetail[];
-}
+// export interface TyreDetail {
+//   id: string;
+//   name: string;
+//   type: string;
+//   price: number;
+//   width: number;
+//   profile: number;
+//   rimSize: number;
+//   logoUrl: string[];
+//   imageUrl: string[];
+// }
 
 // Functions using RestAPI
 export default async function GetAllTyreWidths(): Promise<TyreWidth[]> {
@@ -74,9 +71,18 @@ export async function GetTyreRimByProfile(profile_id: any): Promise<TyreRim[]> {
 
 
 // Functions using GraphQL 
-export async function SearchTyres() {}
+export async function SearchTyres(width: number, profile: number, rim: number) {
+  const tyreQuery = `{
+    data: allTyre(where: {width_eq: ${width} profile_eq: ${profile} rimSize_eq: ${rim}}){
+      ${ALL_TYRES_QUERY}
+    }
+  }`
 
-export async function GetTyreById(id: string): Promise<any> {
+  const data = await fetchGraphQL(tyreQuery);
+  return data.data.data;
+}
+
+export async function GetTyreById(id: string): Promise<TyreDetail> {
   const tyreQuery = `{
     data: tyre(id: "${id}")
     {
@@ -87,9 +93,43 @@ export async function GetTyreById(id: string): Promise<any> {
   
   const data = await fetchGraphQL(tyreQuery);
   return data.data.data;
+  // return data.data.map((data: any) => ({
+  //   id: data.id,
+  //   name: data.name,
+  //   type: data.type,
+  //   price: data.price,
+  //   width: data.width,
+  //   profile: data.profile,
+  //   rimSize: data.rimSize,
+  //   logoUrl: data.logo.results.map((logoUrl: {
+  //     result: {
+  //       fileUrl: any;
+  //     };
+  //   }) => {
+  //     return logoUrl.result.fileUrl;
+  //   }),
+  //   tyreImages: data.tyreImage.results.map((imageUrl: {
+  //     result: {
+  //       fileUrl: any;
+  //     };
+  //   }) => {
+  //     const url = imageUrl.result.fileUrl;
+  //   }),
+  // }));
 }
 
-export async function GetAllTyres(): Promise<any> {
-  const data = await fetchGraphQL(ALL_TYRES_QUERY);
+export async function GetAllTyres(): Promise<TyreOverview[]> {
+  const tyreQuery = `{
+    data: allTyre {
+      ${ALL_TYRES_QUERY}
+    }
+  }`
+  const data = await fetchGraphQL(tyreQuery);
   return data.data.data;
+}
+
+function extractTyre({ data }: { data: TyreOverview }){
+  return data.results.map((tyre: TyreDetail) => {
+    return tyre;
+  });
 }
