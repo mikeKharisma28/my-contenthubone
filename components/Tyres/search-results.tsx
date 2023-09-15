@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 
 interface SearchResultsProps {
@@ -12,6 +13,8 @@ function SearchResults({ apiUrl }: SearchResultsProps) {
   useEffect(() => {
     (async () => {
       const response = await fetch(apiUrl);
+      const tyreList = await response.json();
+      console.log(tyreList);
     })();
   });
 
@@ -53,9 +56,12 @@ function SearchResults({ apiUrl }: SearchResultsProps) {
               </div>
             </div>
           </div>
-          <button className="hover:bg-red-500 w-52 text-red-700 font-semibold hover:text-white py-2 px-4 border-2 border-red-500">
+          <Link
+            href={`/tyres/detail/${encodeURIComponent("")}`}
+            className="hover:bg-red-500 w-52 text-red-700 font-semibold hover:text-white py-2 px-4 border-2 border-red-500"
+          >
             View details
-          </button>
+          </Link>
         </div>
       </div>
     </div>

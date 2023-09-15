@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { LuCheck, LuChevronsUpDown } from 'react-icons/lu';
-import { TyreProfile, TyreRim, TyreWidth } from '@/lib/tyres/tyres-lib';
+import { TyreProfile, TyreRim, TyreWidth } from '@/types/tyre-type';
 import { Button, Spinner } from 'flowbite-react';
 import SearchResults from './search-results';
 
@@ -255,7 +255,7 @@ const SearchTyreBySize = (): JSX.Element => {
           )}
         </Button>
         {isLoading ? <Spinner className="fill-white text-gray-400" size="xl" /> : ''}
-        {isLoaded ? <SearchResults apiUrl="" /> : ''}
+        {isLoaded ? <SearchResults apiUrl={`/api/tyres/searchTyre?width=${selectedTyreWidth}&profile=${selectedTyreProfile}&rim=${selectedTyreRim}`} /> : ''}
       </div>
     </div>
   );

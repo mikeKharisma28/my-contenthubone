@@ -36,7 +36,13 @@ type Props = {
 const Page = ({ tyreData }: Props) => {
   // console.log("Tyre data loaded in page: " + tyreData);
   const tyre = tyreData[0];
-  return <div>Tyre {tyre.id}</div>;
+  return (
+    <div 
+        className="mt-10 my-10"
+    >
+        
+    </div>
+  );
 };
 
 export default Page;

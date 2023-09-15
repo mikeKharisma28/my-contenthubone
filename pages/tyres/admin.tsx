@@ -67,7 +67,7 @@ const Page = ({ tyresList }: Props) => {
                 <td className="px-6 py-4">
                   <div className="flex flex-row gap-4">
                     <Link
-                      href={`/tyres/detail/${encodeURIComponent(tyre.id)}`}
+                      href={`/tyres/update/${encodeURIComponent(tyre.id)}`}
                       className="font-medium text-green-600 dark:text-green-500 hover:underline"
                     >
                       Edit
