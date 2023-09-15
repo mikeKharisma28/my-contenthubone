@@ -1,4 +1,28 @@
-const Page = () => {
+import TyreDetail from '@/types/tyre-type';
+import Link from 'next/link';
+// import { useEffect, useState } from "react";
+
+export async function getStaticProps() {
+  const baseUrl = (
+    process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_API_PROD
+      : process.env.NEXT_PUBLIC_API_DEV
+  ) as string;
+  const endpoint = '/api/tyres/getAllTyres';
+  const response = await fetch(baseUrl + endpoint);
+  const tyresList = await response.json();
+
+  return {
+    props: { tyresList },
+    revalidate: 10
+  };
+}
+
+type Props = {
+  tyresList: TyreDetail[];
+};
+
+const Page = ({ tyresList }: Props) => {
   return (
     <div className="m-20 max-h-fit">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -12,6 +36,9 @@ const Page = () => {
                 Product
               </th>
               <th scope="col" className="px-6 py-3">
+                Type
+              </th>
+              <th scope="col" className="px-6 py-3">
                 Price
               </th>
               <th scope="col" className="px-6 py-3">
@@ -20,42 +47,41 @@ const Page = () => {
             </tr>
           </thead>
           <tbody>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-              <td className="w-32 p-4">
-                <img src="/docs/images/products/apple-watch.png" alt="Apple Watch" />
-              </td>
-              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">Apple Watch</td>
-              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">$599</td>
-              <td className="px-6 py-4">
-                <a href="#" className="font-medium text-red-600 dark:text-red-500 hover:underline">
-                  Remove
-                </a>
-              </td>
-            </tr>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-              <td className="w-32 p-4">
-                <img src="/docs/images/products/imac.png" alt="Apple Imac" />
-              </td>
-              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">Imac 27"</td>
-              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">$2499</td>
-              <td className="px-6 py-4">
-                <a href="#" className="font-medium text-red-600 dark:text-red-500 hover:underline">
-                  Remove
-                </a>
-              </td>
-            </tr>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-              <td className="w-32 p-4">
-                <img src="/docs/images/products/iphone-12.png" alt="Iphone 12" />
-              </td>
-              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">Iphone 12</td>
-              <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">$999</td>
-              <td className="px-6 py-4">
-                <a href="#" className="font-medium text-red-600 dark:text-red-500 hover:underline">
-                  Remove
-                </a>
-              </td>
-            </tr>
+            {tyresList.map((tyre) => (
+              <tr
+                key={tyre.id}
+                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+              >
+                <td className="w-32 p-4">
+                  <img src={tyre.tyreImage.results[0].fileUrl} alt={tyre.name} />
+                </td>
+                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                  {tyre.name}
+                </td>
+                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                  ${tyre.price}
+                </td>
+                <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                  {tyre.type}
+                </td>
+                <td className="px-6 py-4">
+                  <div className="flex flex-row gap-4">
+                    <Link
+                      href={`/tyres/detail/${encodeURIComponent(tyre.id)}`}
+                      className="font-medium text-green-600 dark:text-green-500 hover:underline"
+                    >
+                      Edit
+                    </Link>
+                    <Link
+                      href="#"
+                      className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                    >
+                      Remove
+                    </Link>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

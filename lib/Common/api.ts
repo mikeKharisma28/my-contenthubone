@@ -25,14 +25,21 @@ async function authenticate(): Promise<string> {
 }
 
 export async function fetchGraphQL(query: string) {
-  return fetch(process.env.SITECORE_ENDPOINT_URL as string, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-GQL-Token': process.env.SITECORE_DEV_AUTH_TOKEN as string
-    },
-    body: JSON.stringify({ query })
-  }).then((response) => response.json());
+  return fetch(
+    (process.env.NODE_ENV === 'production'
+      ? process.env.SITECORE_ENDPOINT_URL_PROD
+      : process.env.SITECORE_ENDPOINT_URL_DEV) as string,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-GQL-Token': (process.env.NODE_ENV === 'production'
+          ? process.env.SITECORE_DEV_AUTH_TOKEN_PROD
+          : process.env.SITECORE_DEV_AUTH_TOKEN_DEV) as string
+      },
+      body: JSON.stringify({ query })
+    }
+  ).then((response) => response.json());
 }
 
 export async function fetchRestAPI(params: any) {
