@@ -57,8 +57,8 @@ const Page = ({ tyreData }: Props) => {
                 id="name"
                 placeholder="Input your tyre name"
                 required
-                type="text"      
-                value={tyre.name}
+                type="text"
+                defaultValue={tyre.name}
               />
             </div>
             <div>
@@ -72,8 +72,8 @@ const Page = ({ tyreData }: Props) => {
                 id="type"
                 placeholder="185/55R15 85V"
                 required
-                type="text"      
-                value={tyre.type}    
+                type="text"
+                defaultValue={tyre.type}
               />
             </div>
             <div>
@@ -89,7 +89,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="150"
                 required
                 type="number"      
-                value={tyre.price}    
+                defaultValue={tyre.price}    
               />
             </div>
           </div>
@@ -107,7 +107,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 185"
                 required
                 type="number"      
-                value={tyre.width}    
+                defaultValue={tyre.width}    
               />
             </div>
             <div>
@@ -122,7 +122,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 55"
                 required
                 type="number"      
-                value={tyre.profile}    
+                defaultValue={tyre.profile}    
               />
             </div>
             <div>
@@ -137,7 +137,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 15"
                 required
                 type="number"      
-                value={tyre.rimSize}    
+                defaultValue={tyre.rimSize}    
               />
             </div>
           </div>

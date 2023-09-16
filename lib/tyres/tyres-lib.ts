@@ -1,4 +1,4 @@
-import ALL_TYRES_QUERY, { TYRE_QUERY } from '@/graphQL/Tyres/tyres-query';
+import ALL_TYRES_QUERY from '@/graphQL/Tyres/tyres-query';
 import { fetchGraphQL, fetchRestAPI } from '../Common/api';
 import TyreDetail, { TyreOverview, TyreProfile, TyreRim, TyreWidth } from '@/types/tyre-type';
 

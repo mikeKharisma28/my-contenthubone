@@ -6,6 +6,7 @@ import { LuCheck, LuChevronsUpDown } from 'react-icons/lu';
 import { TyreProfile, TyreRim, TyreWidth } from '@/types/tyre-type';
 import { Button, Spinner } from 'flowbite-react';
 import SearchResults from './search-results';
+import { CircularProgress } from '@chakra-ui/react';
 
 const SearchTyreBySize = (): JSX.Element => {
   const [selectedTyreWidth, setSelectedTyreWidth] = useState<TyreWidth>();
@@ -254,7 +255,8 @@ const SearchTyreBySize = (): JSX.Element => {
             </div>
           )}
         </Button>
-        {isLoading ? <Spinner className="fill-white text-gray-400" size="xl" /> : ''}
+        {/* {isLoading ? <Spinner className="fill-white text-gray-400" size="xl" /> : ''} */}
+        {isLoading ? <CircularProgress isIndeterminate color="red.600" /> : ''}
         {isLoaded ? <SearchResults apiUrl={`/api/tyres/searchTyre?width=${selectedTyreWidth}&profile=${selectedTyreProfile}&rim=${selectedTyreRim}`} /> : ''}
       </div>
     </div>
