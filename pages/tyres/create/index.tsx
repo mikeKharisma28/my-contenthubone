@@ -1,44 +1,8 @@
-import { GetAllTyres } from '@/lib/tyres/tyres-lib';
-import TyreDetail from '@/types/tyre-type';
 import { Button, Label, TextInput } from 'flowbite-react';
 import Link from 'next/link';
-import { BiDollar, BiArrowBack, BiSolidSave } from 'react-icons/bi';
+import { BiArrowBack, BiDollar, BiSolidSave } from 'react-icons/bi';
 
-type Params = {
-  params: {
-    id: string;
-  };
-};
-export async function getStaticProps({ params }: Params) {
-  const baseUrl = (
-    process.env.NODE_ENV === 'production'
-      ? process.env.NEXT_PUBLIC_API_PROD
-      : process.env.NEXT_PUBLIC_API_DEV
-  ) as string;
-  const endpoint = `/api/tyres/getTyreById?id=${params.id}`;
-  const response = await fetch(baseUrl + endpoint);
-  const tyreData = await response.json();
-  return {
-    props: { tyreData },
-    revalidate: 10
-  };
-}
-
-export async function getStaticPaths() {
-  const tyreList = await GetAllTyres();
-
-  return {
-    paths: tyreList.map(({ id }) => `/tyres/update/${id}`) ?? [],
-    fallback: true
-  };
-}
-type Props = {
-  tyreData: TyreDetail[];
-};
-
-const Page = ({ tyreData }: Props) => {
-  // console.log("Tyre data loaded in page: " + tyreData);
-  const tyre = tyreData[0];
+const Page = () => {
   return (
     <div className="flex flex-col mt-10 mx-16 gap-10">
       <div className="flex flex-row items-center gap-3">
@@ -59,7 +23,6 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="Input your tyre name"
                 required
                 type="text"
-                defaultValue={tyre.name}
               />
             </div>
             <div>
@@ -71,7 +34,6 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="185/55R15 85V"
                 required
                 type="text"
-                defaultValue={tyre.type}
               />
             </div>
             <div>
@@ -84,7 +46,6 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="150"
                 required
                 type="number"
-                defaultValue={tyre.price}
               />
             </div>
           </div>
@@ -99,7 +60,6 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 185"
                 required
                 type="number"
-                defaultValue={tyre.width}
               />
             </div>
             <div>
@@ -111,7 +71,6 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 55"
                 required
                 type="number"
-                defaultValue={tyre.profile}
               />
             </div>
             <div>
@@ -123,7 +82,6 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 15"
                 required
                 type="number"
-                defaultValue={tyre.rimSize}
               />
             </div>
           </div>

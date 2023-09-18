@@ -57,7 +57,7 @@ function SearchResults({ apiUrl }: SearchResultsProps) {
             </div>
           </div>
           <Link
-            href={`/tyres/detail/${encodeURIComponent("")}`}
+            href={`/tyres/detail/${encodeURIComponent('')}`}
             className="hover:bg-red-500 w-52 text-red-700 font-semibold hover:text-white py-2 px-4 border-2 border-red-500"
           >
             View details

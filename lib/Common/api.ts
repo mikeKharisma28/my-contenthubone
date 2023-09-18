@@ -1,5 +1,6 @@
 import qs from 'qs';
 
+// private functions
 async function authenticate(): Promise<string> {
   const response = await fetch(`${process.env.CONTENT_MANAGEMENT_AUTH_URL}`, {
     method: 'POST',
@@ -24,6 +25,7 @@ async function authenticate(): Promise<string> {
   return accessToken;
 }
 
+// public functions
 export async function fetchGraphQL(query: string) {
   return fetch(
     (process.env.NODE_ENV === 'production'
@@ -55,6 +57,27 @@ export async function fetchRestAPI(params: any) {
       'Content-Type': 'application/json'
     }
   });
+  if (!response.ok) {
+    throw new Error(
+      `Content hub one returned ${response.status} ${response.statusText} for ${url}`
+    );
+  }
+  return await response.json();
+}
+
+export async function postContentItemRestAPI(jsonBody: string) {
+  const token = await authenticate();
+  const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items`;
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify({ jsonBody }),
+  });
+
   if (!response.ok) {
     throw new Error(
       `Content hub one returned ${response.status} ${response.statusText} for ${url}`

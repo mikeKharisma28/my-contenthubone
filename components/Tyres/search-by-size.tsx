@@ -257,7 +257,13 @@ const SearchTyreBySize = (): JSX.Element => {
         </Button>
         {/* {isLoading ? <Spinner className="fill-white text-gray-400" size="xl" /> : ''} */}
         {isLoading ? <CircularProgress isIndeterminate color="red.600" /> : ''}
-        {isLoaded ? <SearchResults apiUrl={`/api/tyres/searchTyre?width=${selectedTyreWidth}&profile=${selectedTyreProfile}&rim=${selectedTyreRim}`} /> : ''}
+        {isLoaded ? (
+          <SearchResults
+            apiUrl={`/api/tyres/searchTyre?width=${selectedTyreWidth}&profile=${selectedTyreProfile}&rim=${selectedTyreRim}`}
+          />
+        ) : (
+          ''
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import ALL_TYRES_QUERY from '@/graphQL/Tyres/tyres-query';
-import { fetchGraphQL, fetchRestAPI } from '../Common/api';
+import { fetchGraphQL, fetchRestAPI, postContentItemRestAPI } from '../Common/api';
 import TyreDetail, { TyreOverview, TyreProfile, TyreRim, TyreWidth } from '@/types/tyre-type';
 
 // Functions using RestAPI
@@ -33,6 +33,39 @@ export async function GetTyreRimByProfile(profile_id: any): Promise<TyreRim[]> {
     id: item.id,
     rim: item.fields.size.value
   }));
+}
+
+export async function CreateNewTyre(
+  tyre: TyreDetail
+) {
+  const tyreJson = `{
+    "contentTypeId": "tyre",
+    "name": "${tyre.name}",
+    "fields": {
+        "type": {
+            "value": "${tyre.type}",
+            "type": "ShortText"
+        },
+        "price": {
+            "value": ${tyre.price},
+            "type": "Integer"
+        },
+        "width": {
+            "value": ${tyre.width},
+            "type": "Integer"
+        },
+        "profile": {
+            "value": ${tyre.profile},
+            "type": "Integer"
+        },
+        "rimSize": {
+            "value": ${tyre.rimSize},
+            "type": "Integer"
+        }
+      }
+    }`;
+
+  const response = await postContentItemRestAPI(tyreJson);
 }
 
 // Functions using GraphQL
