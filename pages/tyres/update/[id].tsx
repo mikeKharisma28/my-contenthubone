@@ -2,6 +2,8 @@ import { GetAllTyres } from '@/lib/tyres/tyres-lib';
 import TyreDetail from '@/types/tyre-type';
 import { Button, Label, TextInput } from 'flowbite-react';
 import Link from 'next/link';
+import Router from 'next/router';
+import { useForm } from 'react-hook-form';
 import { BiDollar, BiArrowBack, BiSolidSave } from 'react-icons/bi';
 
 type Params = {
@@ -37,8 +39,36 @@ type Props = {
 };
 
 const Page = ({ tyreData }: Props) => {
-  // console.log("Tyre data loaded in page: " + tyreData);
   const tyre = tyreData[0];
+
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = (formData: any) => {
+    (async () => {
+      const url = '/api/tyres/updateTyre';
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: tyre.id,
+          name: formData['name'],
+          type: formData['type'],
+          price: formData['price'],
+          width: formData['width'],
+          profile: formData['profile'],
+          rimSize: formData['rimSize']
+        })
+      });
+      if (res.ok) {
+        Router.push({
+          pathname: '/tyres/admin'
+        });
+      }
+    })();
+  };
+
   return (
     <div className="flex flex-col mt-10 mx-16 gap-10">
       <div className="flex flex-row items-center gap-3">
@@ -47,7 +77,7 @@ const Page = ({ tyreData }: Props) => {
         </Link>
         <Label htmlFor="Title" value="Tyre Detail" className="text-2xl" />
       </div>
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-row gap-4">
           <div className="w-1/2 flex flex-col gap-4">
             <div>
@@ -59,6 +89,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="Input your tyre name"
                 required
                 type="text"
+                {...register('name')}
                 defaultValue={tyre.name}
               />
             </div>
@@ -71,6 +102,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="185/55R15 85V"
                 required
                 type="text"
+                {...register('type')}
                 defaultValue={tyre.type}
               />
             </div>
@@ -84,6 +116,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="150"
                 required
                 type="number"
+                {...register('price')}
                 defaultValue={tyre.price}
               />
             </div>
@@ -99,6 +132,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 185"
                 required
                 type="number"
+                {...register('width')}
                 defaultValue={tyre.width}
               />
             </div>
@@ -111,6 +145,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 55"
                 required
                 type="number"
+                {...register('profile')}
                 defaultValue={tyre.profile}
               />
             </div>
@@ -123,6 +158,7 @@ const Page = ({ tyreData }: Props) => {
                 placeholder="e.g 15"
                 required
                 type="number"
+                {...register('rimSize')}
                 defaultValue={tyre.rimSize}
               />
             </div>
@@ -130,7 +166,7 @@ const Page = ({ tyreData }: Props) => {
         </div>
         <div className="flex flex-col gap-4">{/* image gallery */}</div>
         <div className="flex flex-row gap-3">
-          <Button color="success">
+          <Button color="success" type="submit">
             <div className="flex flex-row items-center gap-1">
               <BiSolidSave className="text-lg" />
               <span className="text-md">Update</span>

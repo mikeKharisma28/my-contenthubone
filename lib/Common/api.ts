@@ -15,13 +15,14 @@ async function authenticate(): Promise<string> {
     })
   });
 
+  // console.log('Response from authenticate: ', response);
+
   if (!response.ok) {
     throw new Error('Failed to fetch access token');
   }
 
   const tokenData = await response.json();
   const accessToken = tokenData.access_token;
-
   return accessToken;
 }
 
@@ -66,6 +67,7 @@ export async function fetchRestAPI(params: any) {
 }
 
 export async function postContentItemRestAPI(jsonBody: string) {
+  // console.log(jsonBody);
   const token = await authenticate();
   const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items`;
   const response = await fetch(url, {
@@ -73,9 +75,9 @@ export async function postContentItemRestAPI(jsonBody: string) {
     credentials: 'include',
     headers: {
       Authorization: `Bearer ${token}`,
-      'Content-type': 'application/json',
+      'Content-type': 'application/json'
     },
-    body: JSON.stringify({ jsonBody }),
+    body: jsonBody
   });
 
   if (!response.ok) {
@@ -84,4 +86,44 @@ export async function postContentItemRestAPI(jsonBody: string) {
     );
   }
   return await response.json();
+}
+
+export async function putContentItemRestAPI(contentItemId: string, jsonBody: string) {
+  const token = await authenticate();
+  const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items/${contentItemId}`;
+  const response = await fetch(url, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-type': 'application/json'
+    },
+    body: jsonBody
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Content hub one returned ${response.status} ${response.statusText} for ${url}`
+    );
+  }
+  return await response.json();
+}
+
+export async function deleteContentItemRestAPI(contentItemId: string) {
+  const token = await authenticate();
+  const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items/${contentItemId}`;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Content hub one returned ${response.status} ${response.statusText} for ${url}`
+    );
+  }
+  // return await response.json();
 }

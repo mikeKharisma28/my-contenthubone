@@ -1,8 +1,10 @@
+import DeleteTyreConfirmation from '@/components/Tyres/delete-tyre-confirmation';
 import TyreDetail from '@/types/tyre-type';
+import { useDisclosure } from '@chakra-ui/react';
 import { Button, Label } from 'flowbite-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { BiArrowBack, BiPlus } from 'react-icons/bi';
-// import { useEffect, useState } from "react";
 
 export async function getStaticProps() {
   const baseUrl = (
@@ -25,6 +27,14 @@ type Props = {
 };
 
 const Page = ({ tyresList }: Props) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [tyreId, setTyreId] = useState('');
+
+  const removeConfirmation = (paramTyreId: string) => {
+    setTyreId(paramTyreId);
+    onOpen();
+  };
+
   return (
     <div className="flex flex-col mt-10 mx-16 gap-10">
       <div className="flex flex-row items-center gap-3">
@@ -68,7 +78,11 @@ const Page = ({ tyresList }: Props) => {
                   className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   <td className="w-32 p-4">
-                    <img src={tyre.tyreImage.results[0].fileUrl} alt={tyre.name} />
+                    {tyre.tyreImage?.results.length !== 0 ? (
+                      <img src={tyre.tyreImage?.results[0].fileUrl} alt={tyre.name} />
+                    ) : (
+                      ''
+                    )}
                   </td>
                   <td className="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                     {tyre.name}
@@ -82,16 +96,15 @@ const Page = ({ tyresList }: Props) => {
                   <td className="px-6 py-4">
                     <div className="flex flex-row gap-4">
                       <Link
-                        href={`/tyres/update/${encodeURIComponent(tyre.id)}`}
+                        href={`/tyres/update/${encodeURIComponent(tyre.id ?? '')}`}
                         className="font-medium text-green-600 dark:text-green-500 hover:underline"
                       >
                         Edit
                       </Link>
-                      <Link
-                        href="#"
-                        className="font-medium text-red-600 dark:text-red-500 hover:underline"
-                      >
-                        Remove
+                      <Link href="#" passHref onClick={() => removeConfirmation(tyre.id ?? '')}>
+                        <button className="font-medium text-red-600 dark:text-red-500 hover:underline">
+                          Remove
+                        </button>
                       </Link>
                     </div>
                   </td>
@@ -99,6 +112,12 @@ const Page = ({ tyresList }: Props) => {
               ))}
             </tbody>
           </table>
+
+          <DeleteTyreConfirmation
+            isOpenDialog={isOpen}
+            onCloseDialog={onClose}
+            contentItemId={tyreId ?? ''}
+          />
         </div>
       </div>
     </div>

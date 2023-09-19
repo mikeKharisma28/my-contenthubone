@@ -1,8 +1,37 @@
 import { Button, Label, TextInput } from 'flowbite-react';
 import Link from 'next/link';
 import { BiArrowBack, BiDollar, BiSolidSave } from 'react-icons/bi';
+import { useForm } from 'react-hook-form';
+import Router from 'next/router';
 
 const Page = () => {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = (formData: any) => {
+    (async () => {
+      const url = '/api/tyres/createNewTyre';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData['name'],
+          type: formData['type'],
+          price: formData['price'],
+          width: formData['width'],
+          profile: formData['profile'],
+          rimSize: formData['rimSize']
+        })
+      });
+      if (res.ok) {
+        Router.push({
+          pathname: '/tyres/admin'
+        });
+      }
+    })();
+  };
+
   return (
     <div className="flex flex-col mt-10 mx-16 gap-10">
       <div className="flex flex-row items-center gap-3">
@@ -11,7 +40,7 @@ const Page = () => {
         </Link>
         <Label htmlFor="Title" value="Tyre Detail" className="text-2xl" />
       </div>
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-row gap-4">
           <div className="w-1/2 flex flex-col gap-4">
             <div>
@@ -23,6 +52,7 @@ const Page = () => {
                 placeholder="Input your tyre name"
                 required
                 type="text"
+                {...register('name')}
               />
             </div>
             <div>
@@ -34,6 +64,7 @@ const Page = () => {
                 placeholder="185/55R15 85V"
                 required
                 type="text"
+                {...register('type')}
               />
             </div>
             <div>
@@ -46,6 +77,7 @@ const Page = () => {
                 placeholder="150"
                 required
                 type="number"
+                {...register('price')}
               />
             </div>
           </div>
@@ -60,6 +92,7 @@ const Page = () => {
                 placeholder="e.g 185"
                 required
                 type="number"
+                {...register('width')}
               />
             </div>
             <div>
@@ -71,27 +104,29 @@ const Page = () => {
                 placeholder="e.g 55"
                 required
                 type="number"
+                {...register('profile')}
               />
             </div>
             <div>
               <div className="mb-2 block">
-                <Label htmlFor="width" value="Width" />
+                <Label htmlFor="rimSize" value="Rim Size" />
               </div>
               <TextInput
-                id="width"
+                id="rimSize"
                 placeholder="e.g 15"
                 required
                 type="number"
+                {...register('rimSize')}
               />
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-4">{/* image gallery */}</div>
         <div className="flex flex-row gap-3">
-          <Button color="success">
+          <Button color="success" type="submit">
             <div className="flex flex-row items-center gap-1">
               <BiSolidSave className="text-lg" />
-              <span className="text-md">Update</span>
+              <span className="text-md">Save</span>
             </div>
           </Button>
           <Button href="/tyres/admin" color="failure">

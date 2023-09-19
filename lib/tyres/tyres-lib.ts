@@ -1,5 +1,11 @@
 import ALL_TYRES_QUERY from '@/graphQL/Tyres/tyres-query';
-import { fetchGraphQL, fetchRestAPI, postContentItemRestAPI } from '../Common/api';
+import {
+  deleteContentItemRestAPI,
+  fetchGraphQL,
+  fetchRestAPI,
+  postContentItemRestAPI,
+  putContentItemRestAPI
+} from '../Common/api';
 import TyreDetail, { TyreOverview, TyreProfile, TyreRim, TyreWidth } from '@/types/tyre-type';
 
 // Functions using RestAPI
@@ -35,37 +41,101 @@ export async function GetTyreRimByProfile(profile_id: any): Promise<TyreRim[]> {
   }));
 }
 
+// export async function CreateNewTyre(tyre: TyreDetail): Promise<any> {
 export async function CreateNewTyre(
-  tyre: TyreDetail
-) {
-  const tyreJson = `{
-    "contentTypeId": "tyre",
-    "name": "${tyre.name}",
-    "fields": {
-        "type": {
-            "value": "${tyre.type}",
-            "type": "ShortText"
-        },
-        "price": {
-            "value": ${tyre.price},
-            "type": "Integer"
-        },
-        "width": {
-            "value": ${tyre.width},
-            "type": "Integer"
-        },
-        "profile": {
-            "value": ${tyre.profile},
-            "type": "Integer"
-        },
-        "rimSize": {
-            "value": ${tyre.rimSize},
-            "type": "Integer"
-        }
+  paramName: string,
+  paramType: string,
+  paramPrice: number,
+  paramWidth: number,
+  paramProfile: number,
+  paramRimSize: number
+): Promise<any> {
+  const tyreJson = {
+    contentTypeId: 'tyre',
+    // name: tyre.name,
+    name: paramName,
+    fields: {
+      type: {
+        // value: tyre.type,
+        value: paramType,
+        type: 'ShortText'
+      },
+      price: {
+        // value: tyre.price,
+        value: paramPrice,
+        type: 'Integer'
+      },
+      width: {
+        // value: tyre.width,
+        value: paramWidth,
+        type: 'Integer'
+      },
+      profile: {
+        // value: tyre.profile,
+        value: paramProfile,
+        type: 'Integer'
+      },
+      rimSize: {
+        // value: tyre.rimSize,
+        value: paramRimSize,
+        type: 'Integer'
       }
-    }`;
+    }
+  };
 
-  const response = await postContentItemRestAPI(tyreJson);
+  const response = await postContentItemRestAPI(JSON.stringify(tyreJson));
+  return response;
+}
+
+export async function UpdateTyre(
+  paramId: string,
+  paramName: string,
+  paramType: string,
+  paramPrice: number,
+  paramWidth: number,
+  paramProfile: number,
+  paramRimSize: number
+): Promise<any> {
+  const tyreJson = {
+    contentTypeId: 'tyre',
+    id: paramId,
+    name: paramName,
+    fields: {
+      type: {
+        // value: tyre.type,
+        value: paramType,
+        type: 'ShortText'
+      },
+      price: {
+        // value: tyre.price,
+        value: paramPrice,
+        type: 'Integer'
+      },
+      width: {
+        // value: tyre.width,
+        value: paramWidth,
+        type: 'Integer'
+      },
+      profile: {
+        // value: tyre.profile,
+        value: paramProfile,
+        type: 'Integer'
+      },
+      rimSize: {
+        // value: tyre.rimSize,
+        value: paramRimSize,
+        type: 'Integer'
+      }
+    }
+  };
+
+  const response = await putContentItemRestAPI(paramId, JSON.stringify(tyreJson));
+  return response;
+}
+
+export async function DeleteTyre(id: string): Promise<any> {
+  const response = await deleteContentItemRestAPI(id);
+  return response;
 }
 
 // Functions using GraphQL

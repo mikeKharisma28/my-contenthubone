@@ -16,15 +16,15 @@ type Media = {
 };
 
 type TyreDetail = {
-  id: string;
+  id?: string;
   name: string;
   type: string;
   price: number;
   width: number;
   profile: number;
   rimSize: number;
-  logo: Media;
-  tyreImage: Media;
+  logo?: Media;
+  tyreImage?: Media;
 };
 export default TyreDetail;
 

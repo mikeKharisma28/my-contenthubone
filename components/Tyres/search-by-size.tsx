@@ -1,5 +1,3 @@
-'use client';
-
 import { Fragment, useEffect, useState } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { LuCheck, LuChevronsUpDown } from 'react-icons/lu';
@@ -246,7 +244,7 @@ const SearchTyreBySize = (): JSX.Element => {
         >
           {isLoading ? (
             <div className="flex flex-row items-center justify-center gap-2">
-              <Spinner className="fill-white text-gray-400" size="lg" />
+              <CircularProgress isIndeterminate color="green.300" size="lg" />
               <span className="text-lg">Loading...</span>
             </div>
           ) : (
@@ -255,8 +253,7 @@ const SearchTyreBySize = (): JSX.Element => {
             </div>
           )}
         </Button>
-        {/* {isLoading ? <Spinner className="fill-white text-gray-400" size="xl" /> : ''} */}
-        {isLoading ? <CircularProgress isIndeterminate color="red.600" /> : ''}
+        {/* {isLoading ? <Spinner className="fill-red-600 text-gray-400" /> : ''} */}
         {isLoaded ? (
           <SearchResults
             apiUrl={`/api/tyres/searchTyre?width=${selectedTyreWidth}&profile=${selectedTyreProfile}&rim=${selectedTyreRim}`}
