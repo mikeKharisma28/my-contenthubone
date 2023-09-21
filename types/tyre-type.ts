@@ -1,19 +1,4 @@
-type MediaResult = {
-  id: string;
-  name: string;
-  fileName: string;
-  fileUrl: string;
-  description: string;
-  fileWidth: number;
-  fileHeight: number;
-  fileId: string;
-  fileSize: number;
-  fileType: string;
-};
-
-type Media = {
-  results: MediaResult[];
-};
+import { Media } from './media-type';
 
 type TyreDetail = {
   id?: string;

@@ -2,7 +2,7 @@ import ALL_TYRES_QUERY from '@/graphQL/Tyres/tyres-query';
 import {
   deleteContentItemRestAPI,
   fetchGraphQL,
-  fetchRestAPI,
+  fetchContentItemRestAPI,
   postContentItemRestAPI,
   putContentItemRestAPI
 } from '../Common/api';
@@ -10,7 +10,7 @@ import TyreDetail, { TyreOverview, TyreProfile, TyreRim, TyreWidth } from '@/typ
 
 // Functions using RestAPI
 export default async function GetAllTyreWidths(): Promise<TyreWidth[]> {
-  const { data } = await fetchRestAPI({
+  const { data } = await fetchContentItemRestAPI({
     'system.contentType.id': 'tyrewidth'
   });
   return data.map((item: any) => ({
@@ -20,7 +20,7 @@ export default async function GetAllTyreWidths(): Promise<TyreWidth[]> {
 }
 
 export async function GetTyreProfilesByWidth(width_id: any): Promise<TyreProfile[]> {
-  const { data } = await fetchRestAPI({
+  const { data } = await fetchContentItemRestAPI({
     'system.contentType.id': 'tyreprofile'
     // '': ''
   });
@@ -31,7 +31,7 @@ export async function GetTyreProfilesByWidth(width_id: any): Promise<TyreProfile
 }
 
 export async function GetTyreRimByProfile(profile_id: any): Promise<TyreRim[]> {
-  const { data } = await fetchRestAPI({
+  const { data } = await fetchContentItemRestAPI({
     'system.contentType.id': 'tyrerim'
     // '': ''
   });

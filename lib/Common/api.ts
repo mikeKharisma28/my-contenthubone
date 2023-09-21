@@ -45,7 +45,8 @@ export async function fetchGraphQL(query: string) {
   ).then((response) => response.json());
 }
 
-export async function fetchRestAPI(params: any) {
+//#region functions to call APIs for Content Items
+export async function fetchContentItemRestAPI(params: any) {
   const token = await authenticate();
   const url =
     `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items?` +
@@ -125,5 +126,26 @@ export async function deleteContentItemRestAPI(contentItemId: string) {
       `Content hub one returned ${response.status} ${response.statusText} for ${url}`
     );
   }
-  // return await response.json();
 }
+//#endregion
+
+//#region functions to call APIs for Media Items
+export async function fetchMediaItemRestAPI() {
+  const token = await authenticate();
+  const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/media`;
+  const response = await fetch(url, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  if (!response.ok) {
+    throw new Error(
+      `Content hub one returned ${response.status} ${response.statusText} for ${url}`
+    );
+  }
+  return await response.json();
+}
+//#endregion

@@ -3,11 +3,11 @@ import { ChangeEvent, useState } from 'react';
 import { BiX, BiFolderOpen } from 'react-icons/bi';
 
 function ImageGalleryWithPreview() {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [files, setFiles] = useState<any[]>([]);
 
   const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
-    setMessage("");
+    setMessage('');
     // let file = e.target.files;
     const selectedFiles = e.target.files;
 
