@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { BiArrowBack, BiDollar, BiSolidSave } from 'react-icons/bi';
 import { useForm } from 'react-hook-form';
 import Router from 'next/router';
+import ImageGalleryWithPreview from '@/components/Media/image-gallery-with-preview';
 
 const Page = () => {
   const { register, handleSubmit } = useForm();
@@ -121,7 +122,22 @@ const Page = () => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-4">{/* image gallery */}</div>
+
+        <div className="flex flex-row gap-4">
+          <div className="w-1/2 flex flex-col">
+            <div className="mb-2 block">
+              <Label htmlFor="name" value="Tyre Images" />
+            </div>
+            <ImageGalleryWithPreview />
+          </div>
+          <div className="w-1/2 flex flex-col">
+            <div className="mb-2 block">
+              <Label htmlFor="name" value="Logo Image" />
+            </div>
+            <ImageGalleryWithPreview />
+          </div>
+        </div>
+
         <div className="flex flex-row gap-3">
           <Button color="success" type="submit">
             <div className="flex flex-row items-center gap-1">
