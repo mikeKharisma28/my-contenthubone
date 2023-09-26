@@ -1,3 +1,5 @@
+import { MediaGeneratedUploadLinks, MediaUpload } from '@/types/media-type';
+import { nanoid } from 'nanoid';
 import qs from 'qs';
 
 // private functions
@@ -147,5 +149,47 @@ export async function fetchMediaItemRestAPI() {
     );
   }
   return await response.json();
+}
+
+export async function generateUploadLinksBulk(paramBodyReq: MediaUpload[]) {
+  const token = await authenticate();
+  const url = `${process.env.MEDIA_UPLOAD_URL}/api/media/v1/upload/link/generate/bulk`;
+
+  // perlu benerin bodyReq, karena code di bawah ini masih belum menjadi array
+  const bodyReq = {
+    requestId: paramBodyReq[0].requestId,
+    filename: paramBodyReq[0].filename,
+    contentType: paramBodyReq[0].contentType,
+    contentLength: paramBodyReq[0].contentLength
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(bodyReq)
+  });
+
+  return response.json();
+}
+
+export async function UploadAsset(generatedLinks: MediaGeneratedUploadLinks[]) {
+  for (let i = 0; i < generatedLinks.length; i++) {
+    const response = await fetch(generatedLinks[i].link, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        Application: 'application/json'
+      }
+      // body:
+    });
+    if (response.status !== 201) {
+      throw new Error(`Content hub one returned status ${response.status}: ${response.statusText}`);
+    }
+  }
 }
 //#endregion

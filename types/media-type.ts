@@ -1,4 +1,9 @@
-type MediaResult = {
+type Media = {
+  results: MediaResult[];
+};
+export default Media;
+
+export type MediaResult = {
   id: string;
   name: string;
   fileName: string;
@@ -10,8 +15,16 @@ type MediaResult = {
   fileSize: number;
   fileType: string;
 };
-export default MediaResult;
 
-export type Media = {
-  results: MediaResult[];
+export type MediaUpload = {
+  requestId: string;
+  filename: string;
+  contentType: string;
+  contentLength: string;
+};
+
+export type MediaGeneratedUploadLinks = {
+  link: string;
+  fileId: string;
+  requestId: string;
 };

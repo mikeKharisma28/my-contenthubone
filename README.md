@@ -1,8 +1,16 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), and also implemented some APIs calling and GraphQL libraries for [Sitecore's Content Hub One](https://www.sitecore.com/products/content-hub-one).
 
 ## Getting Started
 
-First, run the development server:
+First, install the libraries that will be used by running the command:
+
+```bash
+npm install
+```
+
+Second, copy and paste file .env.example, and / or rename .env.example file to .env. Then insert the parameters value stated in the .env file provided.
+
+Third, run the development server:
 
 ```bash
 npm run dev

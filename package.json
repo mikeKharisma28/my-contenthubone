@@ -29,6 +29,7 @@
     "graphql": "~15.8.0",
     "graphql-tag": "^2.12.6",
     "marked": "^7.0.3",
+    "nanoid": "^5.0.1",
     "next": "13.4.19",
     "postcss": "8.4.29",
     "prettier": "^3.0.3",

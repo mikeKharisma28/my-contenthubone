@@ -1,23 +1,28 @@
-import { Button, Label } from 'flowbite-react';
-import { ChangeEvent, useState } from 'react';
-import { BiX, BiFolderOpen } from 'react-icons/bi';
+import { Button, useDisclosure } from '@chakra-ui/react';
+import { ChangeEvent, InputHTMLAttributes, forwardRef, useState } from 'react';
+import { BiX, BiSolidFolderOpen } from 'react-icons/bi';
+import ImagesFromContentHubOne from './images-from-contenthubone';
 
-function ImageGalleryWithPreview() {
+interface Props extends InputHTMLAttributes<HTMLInputElement> {}
+
+// function ImageGalleryWithPreview({ name }: Props) {
+const ImageGalleryWithPreview = forwardRef((_Props: Props) => {
   const [message, setMessage] = useState('');
   const [files, setFiles] = useState<any[]>([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handleFile = (e: ChangeEvent<HTMLInputElement>) => {
     setMessage('');
-    // let file = e.target.files;
+
     const selectedFiles = e.target.files;
 
     if (selectedFiles !== null) {
-      console.log(files);
       for (let i = 0; i < selectedFiles.length; i++) {
         const fileType = selectedFiles[i].type;
         const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
         if (validImageTypes.includes(fileType)) {
           setFiles([...files, selectedFiles[i]]);
+          // _Props.onChange(files);
         } else {
           setMessage("Only image's files accepted");
         }
@@ -41,22 +46,16 @@ function ImageGalleryWithPreview() {
             onChange={handleFile}
             className="h-full w-full bg-green-200 opacity-0 z-10 absolute"
             multiple={false}
-            name="files[]"
+            name={_Props.name}
           />
           <div className="h-full w-full bg-gray-200 absolute z-1 flex justify-center items-center top-0">
             <div className="flex flex-col justify-center items-center">
               <i className="text-gray-400 text-2xl">
-                <BiFolderOpen />
+                <BiSolidFolderOpen />
               </i>
               <span className="text-[12px] font-semibold">Drag and Drop a file</span>
             </div>
           </div>
-        </div>
-        <div className="mt-2 flex flex-col items-center gap-2">
-          <span className="text-[10px]">Or</span>
-          <Button>
-            <span className="text-[12px] font-semibold">Get images from Content Hub One Media</span>
-          </Button>
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
           {files.map((file, key) => (
@@ -73,9 +72,16 @@ function ImageGalleryWithPreview() {
             </div>
           ))}
         </div>
+        <div className="mt-2 flex flex-col items-center gap-2">
+          <span className="text-[10px]">Or</span>
+          <Button onClick={onOpen}>
+            <span className="text-[12px] font-semibold">Get images from Content Hub One Media</span>
+          </Button>
+        </div>
       </div>
+      <ImagesFromContentHubOne isOpenDialog={isOpen} onCloseDialog={onClose} />
     </div>
   );
-}
+});
 
 export default ImageGalleryWithPreview;
