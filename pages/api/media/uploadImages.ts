@@ -16,4 +16,5 @@ export default async function handler(_request: ContentHubParams, response: Next
   if (_request.method !== 'POST') {
     return response.status(405).send({ message: 'Only POST requests allowed' });
   }
+  
 }

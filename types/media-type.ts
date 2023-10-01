@@ -16,7 +16,7 @@ export type MediaResult = {
   fileType: string;
 };
 
-export type MediaUpload = {
+export type MediaReqUploadLinks = {
   requestId: string;
   filename: string;
   contentType: string;

@@ -6,6 +6,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { BiArrowBack, BiDollar, BiSolidFolderOpen, BiSolidSave, BiX } from 'react-icons/bi';
 import ImagesFromContentHubOne from '../Media/images-from-contenthubone';
 import { useDisclosure } from '@chakra-ui/react';
+import { MediaReqUploadLinks } from '@/types/media-type';
+import { nanoid } from 'nanoid';
+import { UploadMediaItems } from '@/lib/media/media-lib';
 
 export default function TyreForm() {
   const { register, handleSubmit, control } = useForm();
@@ -16,22 +19,41 @@ export default function TyreForm() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   //   const formData = new FormData();
 
-  function GenerateUploadLinks() {}
+  function UploadImages(bodyReq: MediaReqUploadLinks[], formData: FormData) {
+    const uploadLinks = UploadMediaItems(bodyReq, formData);
+    console.log(uploadLinks);
+  }
 
   const onSubmit = (data: any) => {
-    const formData = new FormData();
-    formData.append('name', control._formValues['name']);
-    formData.append('type', control._formValues['type']);
-    formData.append('price', control._formValues['price']);
-    formData.append('width', control._formValues['width']);
-    formData.append('profile', control._formValues['profile']);
-    formData.append('rimSize', control._formValues['rimSize']);
+    const tyreImageFormData = new FormData();
+    const logoImageFormData = new FormData();
+    // formData.append('name', control._formValues['name']);
+    // formData.append('type', control._formValues['type']);
+    // formData.append('price', control._formValues['price']);
+    // formData.append('width', control._formValues['width']);
+    // formData.append('profile', control._formValues['profile']);
+    // formData.append('rimSize', control._formValues['rimSize']);
+    const reqTyreImgUploadLinks: MediaReqUploadLinks[] = tyreImage.map((item) => ({
+      requestId: nanoid(),
+      filename: item.name,
+      contentType: item.type,
+      contentLength: item.size.toString()
+    }));
+    const reqLogoImgUploadLinks: MediaReqUploadLinks[] = logoImage.map((item) => ({
+      requestId: nanoid(),
+      filename: item.name,
+      contentType: item.type,
+      contentLength: item.size.toString()
+    }));
+
     tyreImage.forEach((file, index) => {
-      formData.append(`tyreImage[${index}]`, file);
+      tyreImageFormData.append(`tyreImage[${index}]`, file);
     });
     logoImage.forEach((file, index) => {
-      formData.append(`logoImage[${index}]`, file);
+      logoImageFormData.append(`logoImage[${index}]`, file);
     });
+
+    console.log("Generated upload links: ", UploadImages(reqTyreImgUploadLinks, tyreImageFormData));
     // async () => {
     //   const url = '/api/tyres/createNewTyre';
     //   const res = await fetch(url, {
@@ -198,21 +220,12 @@ export default function TyreForm() {
                   {tyreImageMessage}
                 </span>
                 <div className="h-20 w-full relative border-2 items-center rounded-md cursor-pointer bg-gray-300 border-gray-400 border-dotted">
-                  <Controller
-                    control={control}
+                  <input
+                    type="file"
+                    onChange={handleTyreFiles}
+                    className="h-full w-full bg-green-200 opacity-0 z-10 absolute"
+                    multiple={false}
                     name="tyreImage"
-                    render={({ field }) => (
-                      <input
-                        type="file"
-                        name="tyreImage"
-                        onChange={(e) => {
-                          field.onChange(e.target.files);
-                          handleTyreFiles(e);
-                        }}
-                        className="h-full w-full bg-green-200 opacity-0 z-10 absolute"
-                        multiple={true}
-                      />
-                    )}
                   />
                   <div className="h-full w-full bg-gray-200 absolute z-1 flex justify-center items-center top-0">
                     <div className="flex flex-col justify-center items-center">
@@ -263,12 +276,10 @@ export default function TyreForm() {
                 <div className="h-20 w-full relative border-2 items-center rounded-md cursor-pointer bg-gray-300 border-gray-400 border-dotted">
                   <input
                     type="file"
-                    // onChange={handleLogoFiles}
+                    onChange={handleLogoFiles}
                     className="h-full w-full bg-green-200 opacity-0 z-10 absolute"
                     multiple={false}
-                    // name="logoImage"
-                    {...register('logoImage[]')}
-                    // name={_Props.name}
+                    name="logoImage"
                   />
                   <div className="h-full w-full bg-gray-200 absolute z-1 flex justify-center items-center top-0">
                     <div className="flex flex-col justify-center items-center">

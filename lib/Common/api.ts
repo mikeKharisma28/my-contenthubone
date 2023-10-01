@@ -1,9 +1,8 @@
-import { MediaGeneratedUploadLinks, MediaUpload } from '@/types/media-type';
-import { nanoid } from 'nanoid';
+import { MediaGeneratedUploadLinks, MediaReqUploadLinks } from '@/types/media-type';
 import qs from 'qs';
 
 // private functions
-async function authenticate(): Promise<string> {
+export async function Authenticate(): Promise<string> {
   const response = await fetch(`${process.env.CONTENT_MANAGEMENT_AUTH_URL}`, {
     method: 'POST',
     headers: {
@@ -17,7 +16,7 @@ async function authenticate(): Promise<string> {
     })
   });
 
-  // console.log('Response from authenticate: ', response);
+  // console.log('Authenticate URL: ', process.env.CONTENT_MANAGEMENT_AUTH_URL);
 
   if (!response.ok) {
     throw new Error('Failed to fetch access token');
@@ -49,7 +48,7 @@ export async function fetchGraphQL(query: string) {
 
 //#region functions to call APIs for Content Items
 export async function fetchContentItemRestAPI(params: any) {
-  const token = await authenticate();
+  const token = await Authenticate();
   const url =
     `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items?` +
     qs.stringify(params, { encodeValuesOnly: true });
@@ -71,7 +70,7 @@ export async function fetchContentItemRestAPI(params: any) {
 
 export async function postContentItemRestAPI(jsonBody: string) {
   // console.log(jsonBody);
-  const token = await authenticate();
+  const token = await Authenticate();
   const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items`;
   const response = await fetch(url, {
     method: 'POST',
@@ -92,7 +91,7 @@ export async function postContentItemRestAPI(jsonBody: string) {
 }
 
 export async function putContentItemRestAPI(contentItemId: string, jsonBody: string) {
-  const token = await authenticate();
+  const token = await Authenticate();
   const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items/${contentItemId}`;
   const response = await fetch(url, {
     method: 'PUT',
@@ -113,7 +112,7 @@ export async function putContentItemRestAPI(contentItemId: string, jsonBody: str
 }
 
 export async function deleteContentItemRestAPI(contentItemId: string) {
-  const token = await authenticate();
+  const token = await Authenticate();
   const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/items/${contentItemId}`;
   const response = await fetch(url, {
     method: 'DELETE',
@@ -133,7 +132,7 @@ export async function deleteContentItemRestAPI(contentItemId: string) {
 
 //#region functions to call APIs for Media Items
 export async function fetchMediaItemRestAPI() {
-  const token = await authenticate();
+  const token = await Authenticate();
   const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/media`;
   const response = await fetch(url, {
     method: 'GET',
@@ -151,8 +150,8 @@ export async function fetchMediaItemRestAPI() {
   return await response.json();
 }
 
-export async function generateUploadLinksBulk(paramBodyReq: MediaUpload[]) {
-  const token = await authenticate();
+export async function generateUploadLinksBulk(paramBodyReq: MediaReqUploadLinks[]) {
+  const token = await Authenticate();
   const url = `${process.env.MEDIA_UPLOAD_URL}/api/media/v1/upload/link/generate/bulk`;
 
   // perlu benerin bodyReq, karena code di bawah ini masih belum menjadi array
