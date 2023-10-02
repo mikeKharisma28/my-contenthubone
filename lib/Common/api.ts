@@ -2,29 +2,28 @@ import { MediaGeneratedUploadLinks, MediaReqUploadLinks } from '@/types/media-ty
 import qs from 'qs';
 
 // private functions
-export async function Authenticate(): Promise<string> {
-  const response = await fetch(`${process.env.CONTENT_MANAGEMENT_AUTH_URL}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: `${process.env.SITECORE_CLIENT_ID}`,
-      client_secret: `${process.env.SITECORE_CLIENT_SECRET}`,
-      audience: `${process.env.SITECORE_AUDIENCE}`
-    })
-  });
+export async function Authenticate(): Promise<string | undefined> {
+  try {
+    const response = await fetch(`${process.env.CONTENT_MANAGEMENT_AUTH_URL}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: `${process.env.SITECORE_CLIENT_ID}`,
+        client_secret: `${process.env.SITECORE_CLIENT_SECRET}`,
+        audience: `${process.env.SITECORE_AUDIENCE}`
+      })
+    });
 
-  // console.log('Authenticate URL: ', process.env.CONTENT_MANAGEMENT_AUTH_URL);
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch access token');
+    const tokenData = await response.json();
+    const accessToken = tokenData.access_token;
+    return accessToken;
+  } 
+  catch {
+    return undefined;
   }
-
-  const tokenData = await response.json();
-  const accessToken = tokenData.access_token;
-  return accessToken;
 }
 
 // public functions
@@ -150,18 +149,36 @@ export async function fetchMediaItemRestAPI() {
   return await response.json();
 }
 
-export async function generateUploadLinksBulk(paramBodyReq: MediaReqUploadLinks[]) {
-  const token = await Authenticate();
+export async function generateUploadLinksBulk(paramBodyReq: MediaReqUploadLinks[], paramToken: Promise<string>) {
+  console.log("Token from parameter", paramToken);
   const url = `${process.env.MEDIA_UPLOAD_URL}/api/media/v1/upload/link/generate/bulk`;
 
   // perlu benerin bodyReq, karena code di bawah ini masih belum menjadi array
-  const bodyReq = {
-    requestId: paramBodyReq[0].requestId,
-    filename: paramBodyReq[0].filename,
-    contentType: paramBodyReq[0].contentType,
-    contentLength: paramBodyReq[0].contentLength
-  };
+  // const bodyReq = {
+  //   requestId: paramBodyReq[0].requestId,
+  //   filename: paramBodyReq[0].filename,
+  //   contentType: paramBodyReq[0].contentType,
+  //   contentLength: paramBodyReq[0].contentLength
+  // };
+  console.log("Param Body Request: ", JSON.stringify(paramBodyReq));
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${paramToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(paramBodyReq)
+  });
+  // const response = new Response();
 
+  return response.json();
+}
+
+export async function generateMediaUploadLink(paramBodyReq: string) {
+  const token = await Authenticate();
+  const url = `${process.env.MEDIA_UPLOAD_URL}/api/media/v1/upload/link/generate/bulk`;
+  console.log("Param body request in function: ", paramBodyReq);
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'include',
@@ -169,13 +186,13 @@ export async function generateUploadLinksBulk(paramBodyReq: MediaReqUploadLinks[
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(bodyReq)
+    body: paramBodyReq
   });
 
   return response.json();
 }
 
-export async function UploadAsset(generatedLinks: MediaGeneratedUploadLinks[]) {
+export async function uploadAssets(generatedLinks: MediaGeneratedUploadLinks[]) {
   for (let i = 0; i < generatedLinks.length; i++) {
     const response = await fetch(generatedLinks[i].link, {
       method: 'PUT',

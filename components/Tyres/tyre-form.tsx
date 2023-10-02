@@ -9,6 +9,7 @@ import { useDisclosure } from '@chakra-ui/react';
 import { MediaReqUploadLinks } from '@/types/media-type';
 import { nanoid } from 'nanoid';
 import { UploadMediaItems } from '@/lib/media/media-lib';
+import Error from 'next/error';
 
 export default function TyreForm() {
   const { register, handleSubmit, control } = useForm();
@@ -16,17 +17,37 @@ export default function TyreForm() {
   const [logoImageMessage, setLogoImageMessage] = useState('');
   const [tyreImage, setTyreImage] = useState<File[]>([]);
   const [logoImage, setLogoImage] = useState<File[]>([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  //   const formData = new FormData();
+  // const { isOpen, onOpen, onClose } = useDisclosure();
 
-  function UploadImages(bodyReq: MediaReqUploadLinks[], formData: FormData) {
-    const uploadLinks = UploadMediaItems(bodyReq, formData);
-    console.log(uploadLinks);
+  async function UploadImages(bodyReq: MediaReqUploadLinks[], formData: FormData, accessToken: Promise<string>) {
+    const uploadLinks = await UploadMediaItems(bodyReq, formData, accessToken);
+    return uploadLinks;
+  }
+
+  async function GetToken(): Promise<string> {
+    const res = await fetch('/api/auth/getAccessToken');
+    if (res.ok) {
+      return res.text();
+    } else {
+      return "Error";
+    }
+  }
+
+  async function GenerateUploadLinks(reqUploadLinks: MediaReqUploadLinks[]): Promise<string> {
+    const res = await fetch('/api/media/generateUploadLinks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(reqUploadLinks)
+    });
+    return res.json();
   }
 
   const onSubmit = (data: any) => {
     const tyreImageFormData = new FormData();
     const logoImageFormData = new FormData();
+    const token = GetToken();
     // formData.append('name', control._formValues['name']);
     // formData.append('type', control._formValues['type']);
     // formData.append('price', control._formValues['price']);
@@ -53,7 +74,9 @@ export default function TyreForm() {
       logoImageFormData.append(`logoImage[${index}]`, file);
     });
 
-    console.log("Generated upload links: ", UploadImages(reqTyreImgUploadLinks, tyreImageFormData));
+    console.log("Generated Upload Links requests:", GenerateUploadLinks(reqTyreImgUploadLinks));
+    // console.log("Token from local API: ", token);
+    // console.log("Generated upload links: ", UploadImages(reqTyreImgUploadLinks, tyreImageFormData, token));
     // async () => {
     //   const url = '/api/tyres/createNewTyre';
     //   const res = await fetch(url, {
@@ -251,16 +274,16 @@ export default function TyreForm() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-2 flex flex-col items-center gap-2">
+                {/* <div className="mt-2 flex flex-col items-center gap-2">
                   <span className="text-[10px]">Or</span>
                   <Button onClick={onOpen}>
                     <span className="text-[12px] font-semibold">
                       Get images from Content Hub One Media
                     </span>
                   </Button>
-                </div>
+                </div> */}
               </div>
-              <ImagesFromContentHubOne isOpenDialog={isOpen} onCloseDialog={onClose} />
+              {/* <ImagesFromContentHubOne isOpenDialog={isOpen} onCloseDialog={onClose} /> */}
             </div>
           </div>
           <div className="w-1/2 flex flex-col">
@@ -305,16 +328,16 @@ export default function TyreForm() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-2 flex flex-col items-center gap-2">
+                {/* <div className="mt-2 flex flex-col items-center gap-2">
                   <span className="text-[10px]">Or</span>
                   <Button onClick={onOpen}>
                     <span className="text-[12px] font-semibold">
                       Get images from Content Hub One Media
                     </span>
                   </Button>
-                </div>
+                </div> */}
               </div>
-              <ImagesFromContentHubOne isOpenDialog={isOpen} onCloseDialog={onClose} />
+              {/* <ImagesFromContentHubOne isOpenDialog={isOpen} onCloseDialog={onClose} /> */}
             </div>
           </div>
         </div>
