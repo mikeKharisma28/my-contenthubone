@@ -1,9 +1,11 @@
-import { GenerateUploadLinks } from '@/lib/media/media-lib';
+import { CreateMediaItem } from '@/lib/media/media-lib';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ParsedUrlQuery } from 'querystring';
 
 interface ContentHubQuery extends ParsedUrlQuery {
-  body: string;
+  fileId: string;
+  name: string;
+  description: string;
 }
 
 interface ContentHubParams extends NextApiRequest {
@@ -13,8 +15,9 @@ interface ContentHubParams extends NextApiRequest {
 export default async function handler(_request: ContentHubParams, response: NextApiResponse) {
   if (_request.method !== 'POST') {
     return response.status(405).send({ message: 'Only POST requests allowed' });
+  } else {
+    const { fileId, name, description } = _request.body;
+    const data = await CreateMediaItem(fileId, name, description);
+    return response.status(201).json(data);
   }
-
-  const data = await GenerateUploadLinks(JSON.stringify(_request.body));
-  return response.status(200).json(data);
 }

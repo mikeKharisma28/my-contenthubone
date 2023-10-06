@@ -1,5 +1,11 @@
-import MediaResult, { MediaGeneratedUploadLinks, MediaReqUploadLinks } from '@/types/media-type';
-import { fetchMediaItemRestAPI, generateMediaUploadLink, generateUploadLinksBulk } from '../Common/api';
+import { GeneratedUploadLinks, MediaResult } from '@/types/media-type';
+import {
+  completeUpload,
+  fetchMediaItemRestAPI,
+  generateMediaUploadLink,
+  postMediaItemRestAPI,
+  uploadAssets
+} from '../Common/api';
 
 export default async function FetchAllMediaItems(): Promise<MediaResult[]> {
   const data = await fetchMediaItemRestAPI();
@@ -17,23 +23,38 @@ export default async function FetchAllMediaItems(): Promise<MediaResult[]> {
   }));
 }
 
-// export async function UploadMediaItems(paramBodyReq: MediaReqUploadLinks[], paramFormData: FormData): Promise<MediaResult[]> {
-export async function UploadMediaItems(paramBodyReq: MediaReqUploadLinks[], paramFormData: FormData, paramAccessToken: Promise<string>): Promise<any> {
-  // Generate upload links
-  const resLinks = await generateUploadLinksBulk(paramBodyReq, paramAccessToken);
-  const generatedLinks: MediaGeneratedUploadLinks[] = resLinks.responses.map((response: any) => ({
+export async function GenerateUploadLinks(paramBodyReq: string) {
+  const resLinks = await generateMediaUploadLink(paramBodyReq);
+  const generatedLinks: GeneratedUploadLinks[] = resLinks.responses.map((response: any) => ({
     link: response.link,
     fileId: response.fileId,
     requestId: response.requestId
   }));
 
-  // Upload asset
+  return generatedLinks;
+}
 
-  // Complete upload
-  // const data = await fetchMediaItemRestAPI();
+export async function UploadAssets(fields: any, files: any) {
+  await uploadAssets(fields, files);
+}
 
-  // Create media items
-  // return data.data.map((item: any) => ({
+export async function CompleteUpload(contentType: string, contentLength: string, fileId: string) {
+  const bodyFileId = {
+    fileId: fileId
+  };
+  const res = await completeUpload(contentType, contentLength, JSON.stringify(bodyFileId));
+  return res;
+}
+
+export async function CreateMediaItem(newFileId: string, name: string, desc: string) {
+  const body = {
+    name: name,
+    description: desc,
+    fileId: newFileId
+  };
+
+  const res = await postMediaItemRestAPI(JSON.stringify(body));
+  // return res.map((item: any) => ({
   //   id: item.id,
   //   name: item.name,
   //   fileName: item.file.name,
@@ -45,16 +66,5 @@ export async function UploadMediaItems(paramBodyReq: MediaReqUploadLinks[], para
   //   fileSize: item.file.size,
   //   fileType: item.file.type
   // }));
-  return generatedLinks;
-}
-
-export async function GenerateUploadLinks(paramBodyReq: string) {
-  const resLinks = await generateMediaUploadLink(paramBodyReq);
-  const generatedLinks: MediaGeneratedUploadLinks[] = resLinks.responses.map((response: any) => ({
-    link: response.link,
-    fileId: response.fileId,
-    requestId: response.requestId
-  }));
-
-  return generatedLinks;
+  return res;
 }

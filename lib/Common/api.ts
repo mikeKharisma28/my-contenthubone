@@ -1,8 +1,8 @@
-import { MediaGeneratedUploadLinks, MediaReqUploadLinks } from '@/types/media-type';
+import { ReqUploadLinks, AssetUpload } from '@/types/media-type';
 import qs from 'qs';
 
 // private functions
-export async function Authenticate(): Promise<string | undefined> {
+async function Authenticate(): Promise<string | undefined> {
   try {
     const response = await fetch(`${process.env.CONTENT_MANAGEMENT_AUTH_URL}`, {
       method: 'POST',
@@ -20,8 +20,7 @@ export async function Authenticate(): Promise<string | undefined> {
     const tokenData = await response.json();
     const accessToken = tokenData.access_token;
     return accessToken;
-  } 
-  catch {
+  } catch {
     return undefined;
   }
 }
@@ -149,36 +148,9 @@ export async function fetchMediaItemRestAPI() {
   return await response.json();
 }
 
-export async function generateUploadLinksBulk(paramBodyReq: MediaReqUploadLinks[], paramToken: Promise<string>) {
-  console.log("Token from parameter", paramToken);
-  const url = `${process.env.MEDIA_UPLOAD_URL}/api/media/v1/upload/link/generate/bulk`;
-
-  // perlu benerin bodyReq, karena code di bawah ini masih belum menjadi array
-  // const bodyReq = {
-  //   requestId: paramBodyReq[0].requestId,
-  //   filename: paramBodyReq[0].filename,
-  //   contentType: paramBodyReq[0].contentType,
-  //   contentLength: paramBodyReq[0].contentLength
-  // };
-  console.log("Param Body Request: ", JSON.stringify(paramBodyReq));
-  const response = await fetch(url, {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      Authorization: `Bearer ${paramToken}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(paramBodyReq)
-  });
-  // const response = new Response();
-
-  return response.json();
-}
-
 export async function generateMediaUploadLink(paramBodyReq: string) {
   const token = await Authenticate();
   const url = `${process.env.MEDIA_UPLOAD_URL}/api/media/v1/upload/link/generate/bulk`;
-  console.log("Param body request in function: ", paramBodyReq);
   const response = await fetch(url, {
     method: 'POST',
     credentials: 'include',
@@ -189,23 +161,86 @@ export async function generateMediaUploadLink(paramBodyReq: string) {
     body: paramBodyReq
   });
 
-  return response.json();
+  return await response.json();
 }
 
-export async function uploadAssets(generatedLinks: MediaGeneratedUploadLinks[]) {
-  for (let i = 0; i < generatedLinks.length; i++) {
-    const response = await fetch(generatedLinks[i].link, {
+// export async function uploadAssets(fields: formidable.Fields<string>, files: formidable.Files<string>) {
+export async function uploadAssets(fields: any, files: any) {
+  const dataAssets: AssetUpload[] = [];
+  for (let i = 0; i < Object.keys(fields).length; i++) {
+    const key = `tyreUploadLink[${i}]`; // Assuming keys are in this format
+    const uploadLink = fields[key][0];
+    const fileKey = `tyreImage[${i}]`; // Assuming keys are in this format
+    const image: File = files[fileKey][0];
+
+    const data: AssetUpload = {
+      uploadLink: uploadLink,
+      file: image
+    };
+
+    dataAssets.push(data);
+  }
+
+  for (var i = 0; i < dataAssets.length; i++) {
+    const formData = new FormData();
+    formData.append("file", dataAssets[i].file);
+
+    const response = await fetch(dataAssets[i].uploadLink, {
       method: 'PUT',
-      credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
-        Application: 'application/json'
-      }
-      // body:
+        'x-mms-content-type': `${dataAssets[i].file.type}`,
+        'x-mms-content-length': '1024',
+        // 'x-ms-blob-type': 'BlockBlob',
+        'Content-Type': `${dataAssets[i].file.type}`,
+        // 'Application': 'application/json'
+      },
+      body: dataAssets[i].file
     });
+    // console.log('response for uploading: ', response);
     if (response.status !== 201) {
       throw new Error(`Content hub one returned status ${response.status}: ${response.statusText}`);
     }
   }
+}
+
+export async function completeUpload(contentType: string, contentLength: string, bodyReq: string) {
+  const token = await Authenticate();
+  const url = `${process.env.MEDIA_UPLOAD_URL}/api/media/v1/upload/link/complete`;
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'x-mms-content-type': `${contentType}`,
+      'x-mms-content-length': `${contentLength}`,
+      'Content-Type': 'application/json'
+    },
+    body: bodyReq
+  });
+
+  return await response.json();
+}
+
+export async function postMediaItemRestAPI(jsonBody: string) {
+  // console.log(jsonBody);
+  const token = await Authenticate();
+  const url = `${process.env.CONTENT_MANAGEMENT_BASE_URL}/api/content/v1/media`;
+  const response = await fetch(url, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-type': 'application/json',
+      Accept: 'text/plain'
+    },
+    body: jsonBody
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Content hub one returned ${response.status} ${response.statusText} for ${url}`
+    );
+  }
+  return await response.json();
 }
 //#endregion

@@ -16,15 +16,24 @@ export type MediaResult = {
   fileType: string;
 };
 
-export type MediaReqUploadLinks = {
+export type ReqUploadLinks = {
   requestId: string;
   filename: string;
   contentType: string;
   contentLength: string;
 };
 
-export type MediaGeneratedUploadLinks = {
+export type GeneratedUploadLinks = {
   link: string;
   fileId: string;
   requestId: string;
+};
+
+export type AssetUpload = {
+  uploadLink: string;
+  file: File;
+};
+
+export type AssetUploaded = {
+  fileId: string;
 };

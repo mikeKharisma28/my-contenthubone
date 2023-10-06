@@ -1,15 +1,14 @@
 import { Button, Label, TextInput } from 'flowbite-react';
-import Link from 'next/link';
-import Router from 'next/router';
-import { ChangeEvent, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { BiArrowBack, BiDollar, BiSolidFolderOpen, BiSolidSave, BiX } from 'react-icons/bi';
-import ImagesFromContentHubOne from '../Media/images-from-contenthubone';
-import { useDisclosure } from '@chakra-ui/react';
-import { MediaReqUploadLinks } from '@/types/media-type';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { BiDollar, BiSolidFolderOpen, BiSolidSave, BiX } from 'react-icons/bi';
+import {
+  AssetUploaded,
+  GeneratedUploadLinks,
+  MediaResult,
+  ReqUploadLinks
+} from '@/types/media-type';
 import { nanoid } from 'nanoid';
-import { UploadMediaItems } from '@/lib/media/media-lib';
-import Error from 'next/error';
 
 export default function TyreForm() {
   const { register, handleSubmit, control } = useForm();
@@ -17,23 +16,20 @@ export default function TyreForm() {
   const [logoImageMessage, setLogoImageMessage] = useState('');
   const [tyreImage, setTyreImage] = useState<File[]>([]);
   const [logoImage, setLogoImage] = useState<File[]>([]);
-  // const { isOpen, onOpen, onClose } = useDisclosure();
 
-  async function UploadImages(bodyReq: MediaReqUploadLinks[], formData: FormData, accessToken: Promise<string>) {
-    const uploadLinks = await UploadMediaItems(bodyReq, formData, accessToken);
-    return uploadLinks;
+  // const [tyreUploadLinks, setTyreUploadLinks] = useState<GeneratedUploadLinks[]>([]);
+  // const [logoUploadLinks, setLogoUploadLinks] = useState<GeneratedUploadLinks[]>([]);
+
+  async function UploadImages(formData: FormData): Promise<boolean> {
+    const res = await fetch('/api/media/uploadAsset', {
+      method: 'PUT',
+      body: formData
+    });
+
+    return res.ok;
   }
 
-  async function GetToken(): Promise<string> {
-    const res = await fetch('/api/auth/getAccessToken');
-    if (res.ok) {
-      return res.text();
-    } else {
-      return "Error";
-    }
-  }
-
-  async function GenerateUploadLinks(reqUploadLinks: MediaReqUploadLinks[]): Promise<string> {
+  async function GenerateUploadLinks(reqUploadLinks: ReqUploadLinks[]): Promise<any> {
     const res = await fetch('/api/media/generateUploadLinks', {
       method: 'POST',
       headers: {
@@ -44,23 +40,60 @@ export default function TyreForm() {
     return res.json();
   }
 
+  async function CompleteUpload(contentType: string, contentLength: number, fileId: string) {
+    const body = {
+      contentType: contentType,
+      contentLength: contentLength,
+      fileId: fileId
+    };
+    const res = await fetch('/api/media/completeUpload', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    return res.json();
+  }
+
+  async function CreateMediaItem(
+    newFileId: string,
+    name: string,
+    desc: string
+  ): Promise<MediaResult> {
+    const res = await fetch('/api/media/createMediaItem', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: name,
+        description: desc,
+        fileId: newFileId
+      })
+    });
+
+    return res.json();
+  }
+
   const onSubmit = (data: any) => {
     const tyreImageFormData = new FormData();
     const logoImageFormData = new FormData();
-    const token = GetToken();
+    // const token = GetToken();
     // formData.append('name', control._formValues['name']);
     // formData.append('type', control._formValues['type']);
     // formData.append('price', control._formValues['price']);
     // formData.append('width', control._formValues['width']);
     // formData.append('profile', control._formValues['profile']);
     // formData.append('rimSize', control._formValues['rimSize']);
-    const reqTyreImgUploadLinks: MediaReqUploadLinks[] = tyreImage.map((item) => ({
+    const reqTyreImgUploadLinks: ReqUploadLinks[] = tyreImage.map((item) => ({
       requestId: nanoid(),
       filename: item.name,
       contentType: item.type,
       contentLength: item.size.toString()
     }));
-    const reqLogoImgUploadLinks: MediaReqUploadLinks[] = logoImage.map((item) => ({
+    const reqLogoImgUploadLinks: ReqUploadLinks[] = logoImage.map((item) => ({
       requestId: nanoid(),
       filename: item.name,
       contentType: item.type,
@@ -74,7 +107,53 @@ export default function TyreForm() {
       logoImageFormData.append(`logoImage[${index}]`, file);
     });
 
-    console.log("Generated Upload Links requests:", GenerateUploadLinks(reqTyreImgUploadLinks));
+    (async () => {     
+      if (reqTyreImgUploadLinks && reqTyreImgUploadLinks.length > 0) {
+        const generatedUploadLinks = await GenerateUploadLinks(reqTyreImgUploadLinks);
+        // setTyreUploadLinks(generatedUploadLinks);
+        const tyreUploadLinks: GeneratedUploadLinks[] = generatedUploadLinks;
+        console.log("tyre upload links: ", tyreUploadLinks);
+        if (tyreUploadLinks && tyreUploadLinks.length > 0) {
+          tyreUploadLinks.forEach((uploadLink, index) => {
+            tyreImageFormData.append(`tyreUploadLink[${index}]`, uploadLink.link);
+          });
+          const isUploadSuccess = await UploadImages(tyreImageFormData);
+          // if (isUploadSuccess) {
+          //   // Complete the upload
+          //   for (let i = 0; i < tyreUploadLinks.length; i++) {
+          //     const successFileId: AssetUploaded = await CompleteUpload(
+          //       tyreImage[i].type,
+          //       tyreImage[i].size,
+          //       tyreUploadLinks[i].fileId
+          //     );
+          //     console.log('success file id: ', successFileId);
+          //     const response = await CreateMediaItem(successFileId.fileId, tyreImage[i].name, "Hardcoded description");
+          //     console.log('Media item creation response: ', response);
+          //   }
+          // }
+        }
+      }
+
+      if (reqLogoImgUploadLinks && reqLogoImgUploadLinks.length > 0) {
+        const generatedUploadLinks = await await GenerateUploadLinks(reqLogoImgUploadLinks);
+        // setLogoUploadLinks(generatedUploadLinks);
+
+        const logoUploadLinks: GeneratedUploadLinks[] = generatedUploadLinks;
+
+        if (logoUploadLinks && logoUploadLinks.length > 0) {
+          logoUploadLinks.forEach((uploadLink, index) => {
+            logoImageFormData.append(`logoUploadLink[${index}]`, uploadLink.link);
+          });
+          const isUploadSuccess = await UploadImages(logoImageFormData);
+          if (isUploadSuccess) {
+            // Complete the upload
+            for (let i = 0; i > logoUploadLinks.length; i++) {
+              await CompleteUpload(logoImage[i].type, logoImage[i].size, logoUploadLinks[i].fileId);
+            }
+          }
+        }
+      }
+    })();
     // console.log("Token from local API: ", token);
     // console.log("Generated upload links: ", UploadImages(reqTyreImgUploadLinks, tyreImageFormData, token));
     // async () => {
