@@ -41,7 +41,6 @@ export async function GetTyreRimByProfile(profile_id: any): Promise<TyreRim[]> {
   }));
 }
 
-// export async function CreateNewTyre(tyre: TyreDetail): Promise<any> {
 export async function CreateNewTyre(
   paramName: string,
   paramType: string,

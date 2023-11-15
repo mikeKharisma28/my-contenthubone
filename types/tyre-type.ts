@@ -1,4 +1,4 @@
-import { Media } from './media-type';
+import Media from './media-type';
 
 type TyreDetail = {
   id?: string;
